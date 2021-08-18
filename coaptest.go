@@ -79,10 +79,9 @@ func ParseCoap(payload []byte, len int) CoapMsg {
 	return msg
 }
 
-func getCoapMsg(port int, adress string) CoapMsg {
+func getCoapMsg(port int) CoapMsg {
 	addr := net.UDPAddr{
 		Port: port,
-		// IP:   net.ParseIP(adress),
 	}
 	conn, err := net.ListenUDP("udp", &addr) // code does not block here
 	if err != nil {
@@ -116,8 +115,7 @@ func compareOption(o0 Option, o1 Option) error {
 }
 
 func containsOptions(expectedOptions []Option, options []Option) bool {
-	for i, eo := range expectedOptions {
-		fmt.Println(i)
+	for _, eo := range expectedOptions {
 		hasOption := false
 		for _, o := range options {
 			err := compareOption(eo, o)
@@ -179,8 +177,8 @@ func CompareCoap(expected CoapMsg, msg CoapMsg) error {
 	return nil
 }
 
-func Expect(expected CoapMsg) error {
-	msg := getCoapMsg(2000, "127.0.0.1")
+func Expect(port int, expected CoapMsg) error {
+	msg := getCoapMsg(port)
 
 	return CompareCoap(expected, msg)
 }
