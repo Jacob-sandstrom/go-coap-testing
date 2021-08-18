@@ -56,6 +56,7 @@ func ParseCoap(payload []byte, len int) CoapMsg {
 	msg.Token = payload[4 : 4+msg.TokenLen]
 
 	byteIndex := 4 + int(msg.TokenLen)
+	hasPayload := false
 	var o Option
 	for {
 		if byteIndex == len {
@@ -63,10 +64,15 @@ func ParseCoap(payload []byte, len int) CoapMsg {
 		}
 		if payload[byteIndex] == 255 {
 			byteIndex++
+			hasPayload = true
 			break
 		}
 		o, byteIndex = ParseOption(payload, byteIndex, o.Number)
 		msg.Options = append(msg.Options, o)
+	}
+
+	if hasPayload {
+		msg.Payload = payload[byteIndex:]
 	}
 
 	fmt.Printf("Parsed coap message: %+v\n", msg)
@@ -166,11 +172,10 @@ func CompareCoap(expected CoapMsg, msg CoapMsg) error {
 		}
 	}
 	if expected.Payload != nil {
-		if bytes.Equal(expected.Payload, msg.Payload) {
+		if !bytes.Equal(expected.Payload, msg.Payload) {
 			return fmt.Errorf("Error wrong Payload: Expected %v, Got %v", expected.Payload, msg.Payload)
 		}
 	}
-
 	return nil
 }
 
