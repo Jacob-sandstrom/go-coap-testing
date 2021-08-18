@@ -76,7 +76,7 @@ func ParseCoap(payload []byte, len int) CoapMsg {
 func getCoapMsg(port int, adress string) CoapMsg {
 	addr := net.UDPAddr{
 		Port: port,
-		IP:   net.ParseIP(adress),
+		// IP:   net.ParseIP(adress),
 	}
 	conn, err := net.ListenUDP("udp", &addr) // code does not block here
 	if err != nil {
@@ -147,7 +147,7 @@ func Expect(expected CoapMsg) error {
 		for i, o := range expected.Options {
 			err := compareOption(o, msg.Options[i])
 			if err != nil {
-				return fmt.Errorf("Error wrong Payload: Expected %v, Got %v", expected.Payload, msg.Payload)
+				return fmt.Errorf("Error wrong Options: Expected %v, Got %v", expected.Options, msg.Options)
 			}
 		}
 	}
