@@ -1,7 +1,7 @@
 # Usage
 
 ## Create the coap message you want
-
+```go
 type CoapMsg struct {
 	Version  byte
 	Type     byte
@@ -12,11 +12,13 @@ type CoapMsg struct {
 	Options  []Option
 	Payload  []byte
 }
+```
 
-## Call Expect(<port>, <CoapMsg>)
+## Call Expect(port, CoapMsg)
 
 The Expect function starts a server at the given port and will process the first udp message recieved into a CoapMsg struct, comparing it to the given struct and returning an error if they don't match.
 
+Only non nil fields in the CoapMsg are checked and excess options are ignored
 
 ## Example 
 [Uses "github.com/plgd-dev/go-coap" as a client](https://github.com/plgd-dev/go-coap)
