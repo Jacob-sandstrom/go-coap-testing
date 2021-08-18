@@ -75,7 +75,7 @@ func ParseCoap(payload []byte, len int) CoapMsg {
 		msg.Payload = payload[byteIndex:]
 	}
 
-	fmt.Printf("Parsed coap message: %+v\n", msg)
+	// fmt.Printf("Parsed coap message: %+v\n", msg)
 	return msg
 }
 
