@@ -103,16 +103,32 @@ func compareOption(o0 Option, o1 Option) error {
 	if o0.Number != o1.Number {
 		return fmt.Errorf("Error wrong Version: Expected %v, Got %v", o0.Number, o1.Number)
 	}
-	if bytes.Equal(o0.Value, o1.Value) {
-		return fmt.Errorf("Error wrong Version: Expected %v, Got %v", o0.Value, o1.Value)
+	if !bytes.Equal(o0.Value, o1.Value) {
+		return fmt.Errorf("Error wrong Value: Expected %v, Got %v", o0.Value, o1.Value)
 	}
-
 	return nil
 }
 
-func Expect(expected CoapMsg) error {
-	msg := getCoapMsg(2000, "127.0.0.1")
+func containsOptions(expectedOptions []Option, options []Option) bool {
+	for i, eo := range expectedOptions {
+		fmt.Println(i)
+		hasOption := false
+		for _, o := range options {
+			err := compareOption(eo, o)
+			if err == nil {
+				hasOption = true
+				break
+			}
+		}
 
+		if !hasOption {
+			return false
+		}
+	}
+	return true
+}
+
+func CompareCoap(expected CoapMsg, msg CoapMsg) error {
 	if expected.Version != 0 {
 		if expected.Version != msg.Version {
 			return fmt.Errorf("Error wrong Version: Expected %v, Got %v", expected.Version, msg.Version)
@@ -144,11 +160,9 @@ func Expect(expected CoapMsg) error {
 		}
 	}
 	if expected.Options != nil {
-		for i, o := range expected.Options {
-			err := compareOption(o, msg.Options[i])
-			if err != nil {
-				return fmt.Errorf("Error wrong Options: Expected %v, Got %v", expected.Options, msg.Options)
-			}
+		if !containsOptions(expected.Options, msg.Options) {
+			return fmt.Errorf("Error wrong Options: Expected %v, Got %v", expected.Options, msg.Options)
+
 		}
 	}
 	if expected.Payload != nil {
@@ -158,4 +172,10 @@ func Expect(expected CoapMsg) error {
 	}
 
 	return nil
+}
+
+func Expect(expected CoapMsg) error {
+	msg := getCoapMsg(2000, "127.0.0.1")
+
+	return CompareCoap(expected, msg)
 }
